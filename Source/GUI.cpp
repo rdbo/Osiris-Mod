@@ -31,8 +31,7 @@
 #include "Hacks/Sound.h"
 #include "Hacks/StreamProofESP.h"
 
-constexpr auto windowFlags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize
-| ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse;
+constexpr auto windowFlags = ImGuiWindowFlags_NoCollapse;
 
 static ImFont* addFontFromVFONT(const std::string& path, float size, const ImWchar* glyphRanges, bool merge) noexcept
 {

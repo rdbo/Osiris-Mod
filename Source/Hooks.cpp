@@ -254,6 +254,9 @@ static void STDCALL_CONV doPostScreenEffects(LINUX_ARGS(void* thisptr,) void* pa
         Visuals::reduceFlashEffect();
         Visuals::updateBrightness();
         Visuals::remove3dSky();
+	Visuals::removeEffects();
+	Visuals::removeTextures();
+	Visuals::fullbright();
         Glow::render();
     }
     hooks->clientMode.callOriginal<void, WIN32_LINUX(44, 45)>(param);

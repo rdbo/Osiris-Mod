@@ -50,6 +50,9 @@ struct VisualsConfig {
     bool noScopeOverlay{ false };
     bool noGrass{ false };
     bool noShadows{ false };
+    bool noEffects{ false };
+    bool noTextures{ false };
+    bool fullbright{ false };
     bool wireframeSmoke{ false };
     bool zoom{ false };
     KeyBindToggle zoomKey;
@@ -119,6 +122,9 @@ static void from_json(const json& j, VisualsConfig& v)
     read(j, "No scope overlay", v.noScopeOverlay);
     read(j, "No grass", v.noGrass);
     read(j, "No shadows", v.noShadows);
+    read(j, "No effects", v.noEffects);
+    read(j, "No textures", v.noTextures);
+    read(j, "Fullbright", v.fullbright);
     read(j, "Wireframe smoke", v.wireframeSmoke);
     read(j, "Zoom", v.zoom);
     read(j, "Zoom key", v.zoomKey);
@@ -179,6 +185,9 @@ static void to_json(json& j, const VisualsConfig& o)
     WRITE("No scope overlay", noScopeOverlay);
     WRITE("No grass", noGrass);
     WRITE("No shadows", noShadows);
+    WRITE("No effects", noEffects);
+    WRITE("No textures", noTextures);
+    WRITE("Fullbright", fullbright);
     WRITE("Wireframe smoke", wireframeSmoke);
     WRITE("Zoom", zoom);
     WRITE("Zoom key", zoomKey);
@@ -398,6 +407,49 @@ void Visuals::removeShadows() noexcept
 {
     static auto shadows = interfaces->cvar->findVar("cl_csm_enabled");
     shadows->setValue(!visualsConfig.noShadows);
+}
+
+void Visuals::removeEffects() noexcept
+{
+    static const std::vector<const char*> effects = {
+        "r_drawdecals", "r_drawmodeldecals", "r_decalstaticprops",
+        "r_drawbatchdecals", "r_drawrain", "r_drawparticles"
+    };
+    static std::vector<ConVar*> vars;
+    if (vars.size() == 0) {
+        for (size_t i = 0; i < effects.size(); ++i) {
+            auto var = interfaces->cvar->findVar(effects[i]);
+            vars.push_back(var);
+        }
+    }
+
+    for (size_t i = 0; i < vars.size(); ++i)
+        vars[i]->setValue(!visualsConfig.noEffects);
+    
+    static auto decals = interfaces->cvar->findVar("r_decals");
+    static int decalsVal = decals->getInt();
+
+    static auto envmapsize = interfaces->cvar->findVar("mat_envmapsize");
+    static int envmapsizeVal = envmapsize->getInt();
+
+    if (visualsConfig.noEffects) {
+        decals->setValue(0);
+        envmapsize->setValue(32);
+    } else {
+        decals->setValue(decalsVal);
+        envmapsize->setValue(envmapsizeVal);
+    }
+}
+
+void Visuals::removeTextures() noexcept
+{
+    // WIP
+}
+
+void Visuals::fullbright() noexcept
+{
+    static auto fullbright = interfaces->cvar->findVar("mat_fullbright");
+    fullbright->setValue(visualsConfig.fullbright);
 }
 
 void Visuals::applyZoom(FrameStage stage) noexcept
@@ -758,6 +810,9 @@ void Visuals::drawGUI(bool contentOnly) noexcept
     ImGui::Checkbox("No scope overlay", &visualsConfig.noScopeOverlay);
     ImGui::Checkbox("No grass", &visualsConfig.noGrass);
     ImGui::Checkbox("No shadows", &visualsConfig.noShadows);
+    ImGui::Checkbox("No effects", &visualsConfig.noEffects);
+    ImGui::Checkbox("No textures", &visualsConfig.noTextures);
+    ImGui::Checkbox("Fullbright", &visualsConfig.fullbright);
     ImGui::Checkbox("Wireframe smoke", &visualsConfig.wireframeSmoke);
     ImGui::NextColumn();
     ImGui::Checkbox("Zoom", &visualsConfig.zoom);
