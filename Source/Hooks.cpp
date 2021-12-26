@@ -255,7 +255,7 @@ static void STDCALL_CONV doPostScreenEffects(LINUX_ARGS(void* thisptr,) void* pa
         Visuals::updateBrightness();
         Visuals::remove3dSky();
 	Visuals::removeEffects();
-	Visuals::removeTextures();
+	Visuals::ultraLow();
 	Visuals::fullbright();
         Glow::render();
     }

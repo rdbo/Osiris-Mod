@@ -51,8 +51,8 @@ struct VisualsConfig {
     bool noGrass{ false };
     bool noShadows{ false };
     bool noEffects{ false };
-    bool noTextures{ false };
     bool fullbright{ false };
+    bool ultraLow{ false };
     bool wireframeSmoke{ false };
     bool zoom{ false };
     KeyBindToggle zoomKey;
@@ -123,8 +123,8 @@ static void from_json(const json& j, VisualsConfig& v)
     read(j, "No grass", v.noGrass);
     read(j, "No shadows", v.noShadows);
     read(j, "No effects", v.noEffects);
-    read(j, "No textures", v.noTextures);
     read(j, "Fullbright", v.fullbright);
+    read(j, "Ultra low", v.ultraLow);
     read(j, "Wireframe smoke", v.wireframeSmoke);
     read(j, "Zoom", v.zoom);
     read(j, "Zoom key", v.zoomKey);
@@ -186,8 +186,8 @@ static void to_json(json& j, const VisualsConfig& o)
     WRITE("No grass", noGrass);
     WRITE("No shadows", noShadows);
     WRITE("No effects", noEffects);
-    WRITE("No textures", noTextures);
     WRITE("Fullbright", fullbright);
+    WRITE("Ultra low", ultraLow);
     WRITE("Wireframe smoke", wireframeSmoke);
     WRITE("Zoom", zoom);
     WRITE("Zoom key", zoomKey);
@@ -441,15 +441,19 @@ void Visuals::removeEffects() noexcept
     }
 }
 
-void Visuals::removeTextures() noexcept
-{
-    // WIP
-}
-
 void Visuals::fullbright() noexcept
 {
     static auto fullbright = interfaces->cvar->findVar("mat_fullbright");
     fullbright->setValue(visualsConfig.fullbright);
+}
+
+void Visuals::ultraLow() noexcept
+{
+	static auto lowresimage = interfaces->cvar->findVar("mat_showlowresimage");
+	static auto tessellation = interfaces->cvar->findVar("mat_tessellationlevel");
+	static const int tesselation_val = tessellation->getInt();
+	lowresimage->setValue(visualsConfig.ultraLow);
+	tessellation->setValue(visualsConfig.ultraLow ? 1 : tesselation_val);
 }
 
 void Visuals::applyZoom(FrameStage stage) noexcept
@@ -811,8 +815,8 @@ void Visuals::drawGUI(bool contentOnly) noexcept
     ImGui::Checkbox("No grass", &visualsConfig.noGrass);
     ImGui::Checkbox("No shadows", &visualsConfig.noShadows);
     ImGui::Checkbox("No effects", &visualsConfig.noEffects);
-    ImGui::Checkbox("No textures", &visualsConfig.noTextures);
     ImGui::Checkbox("Fullbright", &visualsConfig.fullbright);
+    ImGui::Checkbox("Ultra low", &visualsConfig.ultraLow);
     ImGui::Checkbox("Wireframe smoke", &visualsConfig.wireframeSmoke);
     ImGui::NextColumn();
     ImGui::Checkbox("Zoom", &visualsConfig.zoom);
