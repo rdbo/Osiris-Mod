@@ -31,6 +31,8 @@ namespace Visuals
     void remove3dSky() noexcept;
     void removeShadows() noexcept;
     void removeEffects() noexcept;
+    void removeDisp() noexcept;
+    void removeFuncDetail() noexcept;
     void fullbright() noexcept;
     void ultraLow() noexcept;
     void applyZoom(FrameStage stage) noexcept;

@@ -51,6 +51,8 @@ struct VisualsConfig {
     bool noGrass{ false };
     bool noShadows{ false };
     bool noEffects{ false };
+    bool noDisp{ false };
+    bool noFuncDetail{ false };
     bool fullbright{ false };
     bool ultraLow{ false };
     bool wireframeSmoke{ false };
@@ -123,6 +125,8 @@ static void from_json(const json& j, VisualsConfig& v)
     read(j, "No grass", v.noGrass);
     read(j, "No shadows", v.noShadows);
     read(j, "No effects", v.noEffects);
+    read(j, "No disp", v.noDisp);
+    read(j, "No func_detail", v.noFuncDetail);
     read(j, "Fullbright", v.fullbright);
     read(j, "Ultra low", v.ultraLow);
     read(j, "Wireframe smoke", v.wireframeSmoke);
@@ -186,6 +190,8 @@ static void to_json(json& j, const VisualsConfig& o)
     WRITE("No grass", noGrass);
     WRITE("No shadows", noShadows);
     WRITE("No effects", noEffects);
+    WRITE("No disp", noDisp);
+    WRITE("No func_detail", noFuncDetail);
     WRITE("Fullbright", fullbright);
     WRITE("Ultra low", ultraLow);
     WRITE("Wireframe smoke", wireframeSmoke);
@@ -432,6 +438,9 @@ void Visuals::removeEffects() noexcept
     static auto envmapsize = interfaces->cvar->findVar("mat_envmapsize");
     static int envmapsizeVal = envmapsize->getInt();
 
+    static auto disableBloom = interfaces->cvar->findVar("mat_disable_bloom");
+    disableBloom->setValue(visualsConfig.noEffects);
+
     if (visualsConfig.noEffects) {
         decals->setValue(0);
         envmapsize->setValue(32);
@@ -439,6 +448,18 @@ void Visuals::removeEffects() noexcept
         decals->setValue(decalsVal);
         envmapsize->setValue(envmapsizeVal);
     }
+}
+
+void Visuals::removeDisp() noexcept
+{
+    static auto drawDisp = interfaces->cvar->findVar("r_drawdisp");
+    drawDisp->setValue(!visualsConfig.noDisp);
+}
+
+void Visuals::removeFuncDetail() noexcept
+{
+    static auto drawFuncDetail = interfaces->cvar->findVar("r_drawfuncdetail");
+    drawFuncDetail->setValue(!visualsConfig.noFuncDetail);
 }
 
 void Visuals::fullbright() noexcept
@@ -815,6 +836,8 @@ void Visuals::drawGUI(bool contentOnly) noexcept
     ImGui::Checkbox("No grass", &visualsConfig.noGrass);
     ImGui::Checkbox("No shadows", &visualsConfig.noShadows);
     ImGui::Checkbox("No effects", &visualsConfig.noEffects);
+    ImGui::Checkbox("No disp", &visualsConfig.noDisp);
+    ImGui::Checkbox("No func_detail", &visualsConfig.noFuncDetail);
     ImGui::Checkbox("Fullbright", &visualsConfig.fullbright);
     ImGui::Checkbox("Ultra low", &visualsConfig.ultraLow);
     ImGui::Checkbox("Wireframe smoke", &visualsConfig.wireframeSmoke);
